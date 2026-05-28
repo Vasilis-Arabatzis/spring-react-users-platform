@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: users-postgres
+    environment:
+      POSTGRES_DB: usersdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: users-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/usersdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+  frontend:
+    build: ./frontend
+    container_name: users-frontend
+    ports:
+      - "3000:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
